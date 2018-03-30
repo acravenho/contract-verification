@@ -23,6 +23,7 @@ app.post('/api/verify', function (req, res) {
     if (bytecode.substring(0, 2) === '0x') {
       bytecode = bytecode.substring(2)
       bytecode = bytecode.substring(0, bytecode.length - 68)
+      res.send(bytecode)
     }
     var data = {
       'address': address,
