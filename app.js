@@ -15,7 +15,7 @@ app.post('/api/verify', function (req, res) {
   var sourceCode = req.body.source
 
   if (!address || !version || !name || !provider || !sourceCode) {
-    res.send('false')
+    res.send('Missing variable')
   }
 
   var web3 = new Web3(new Web3.providers.HttpProvider(provider))
@@ -43,13 +43,13 @@ app.post('/api/verify', function (req, res) {
             var send = ValidateCode(output, data, bytecode, res)
             res.send(send)
           } else {
-            console.log(err)
+            res.send(err)
           }
         })
       }
       return
     } catch (e) {
-      console.error(e.stack)
+      res.send(e.stack)
     }
   })
 })
