@@ -30,8 +30,9 @@ app.post('/api/verify', function (req, res) {
       'optimization': optimization,
       'contractName': name,
       'sourceCode': sourceCode,
-      'swarm': swarm,
-      'bytecode': bytecode
+      'swarm': 'bzzr://' + swarm,
+      'bytecode': bytecode,
+      'comparableBytecode': bytecodeCompare
       // 'sourceCode': 'pragma solidity 0.4.21;contract Test {int private count = 0;function getCount() public constant returns (int) {return count;}}'
     }
 
