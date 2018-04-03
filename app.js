@@ -82,8 +82,10 @@ var ValidateCode = function (output, data, bytecode, response) {
     return data
   } else {
     var runtime = output.contracts[data.contractName].runtimeBytecode
+    var dataBytecode = output.contracts[data.contractName].bytecode
     runtime = runtime.substring(0, runtime.length - 68)
     data.runtime = runtime
+    data.compiledBytecode = dataBytecode
     if (runtime.indexOf(bytecode) > -1) {
       data.verified = 'yes'
       data.abi = output.contracts[data.contractName].interface
