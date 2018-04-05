@@ -13,7 +13,6 @@ app.post('/api/verify', function (req, res) {
   var provider = req.body.provider
   var optimization = req.body.optimization
   var sourceCode = req.body.source
-
   /*
   var address = '0x37536bc1088010081691eec2ea6ae5c93533ed24'
   var version = 'v0.4.21+commit.dfe3193c'
@@ -22,7 +21,6 @@ app.post('/api/verify', function (req, res) {
   var optimization = 0
   var sourceCode = 'dafdf'
   */
-
   var web3 = new Web3(new Web3.providers.HttpProvider(provider))
   web3.eth.getCode(address).then(function (bytecode) {
     if (bytecode.substring(0, 2) === '0x') {
