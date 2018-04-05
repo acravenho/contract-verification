@@ -14,12 +14,24 @@ app.post('/api/verify', function (req, res) {
   var optimization = req.body.optimization
   var sourceCode = req.body.source
 
+  /*
+  var address = '0x37536bc1088010081691eec2ea6ae5c93533ed24'
+  var version = 'v0.4.21+commit.dfe3193c'
+  var name = 'HelloWorld'
+  var provider = 'https://core.poa.network:443'
+  var optimization = 0
+  var sourceCode = 'dafdf'
+  */
+
   var web3 = new Web3(new Web3.providers.HttpProvider(provider))
   web3.eth.getCode(address).then(function (bytecode) {
     if (bytecode.substring(0, 2) === '0x') {
       bytecode = bytecode.substring(2)
-      var bytecodeCompare = bytecode.substring(0, bytecode.length - 68)
-      var swarm = bytecode.substring(bytecode.length - 68, bytecode.length - 4)
+      var last = bytecode.substr(bytecode.length - 4)
+      if (last === '0029') {
+        var bytecodeCompare = bytecode.substring(0, bytecode.length - 68)
+        var swarm = bytecode.substring(bytecode.length - 68, bytecode.length - 4)
+      }
     }
 
     var data = {
@@ -32,8 +44,8 @@ app.post('/api/verify', function (req, res) {
       'sourceCode': sourceCode,
       'swarm': 'bzzr://' + swarm,
       'bytecode': bytecode,
-      'comparableBytecode': bytecodeCompare
-      // 'sourceCode': 'pragma solidity 0.4.21;contract Test {int private count = 0;function getCount() public constant returns (int) {return count;}}'
+      'comparableBytecode': bytecodeCompare,
+      'last': last
     }
 
     if (!address || !version || !name || !provider || !sourceCode) {
