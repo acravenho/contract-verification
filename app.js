@@ -36,7 +36,16 @@ app.get('/api/token', function (req, res) {
   var contractABI = require('./contracts/erc20.json')
   var provider = req.query.provider
   var contractAddress = req.query.contract
-  var web3 = new Web3(new Web3.providers.HttpProvider(provider))
+  var prov
+  if (provider === 'sokol') {
+    prov = 'https://sokol.poa.network'
+  } else if (provider === 'core') {
+    prov = 'https://core.poa.network'
+  }
+
+  console.log(prov)
+
+  var web3 = new Web3(new Web3.providers.HttpProvider(prov))
 
   if (!contractAddress) {
     res.send('No contract address sent')
@@ -54,13 +63,19 @@ app.get('/api/token', function (req, res) {
         if (err) {
           res.send(err)
         }
-        var data = {
-          'tokenName': name,
-          'decimals': decimals,
-          'totalSupply': totalSupply,
-          'contractAddress': contractAddress
-        }
-        res.send(data)
+        tokenContract.methods.symbol().call(function (err, symbol) {
+          if (err) {
+            res.send(err)
+          }
+          var data = {
+            'tokenName': name,
+            'decimals': decimals,
+            'totalSupply': totalSupply,
+            'symbol': symbol,
+            'contractAddress': contractAddress
+          }
+          res.send(data)
+        })
       })
     })
   })
