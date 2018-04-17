@@ -11,7 +11,14 @@ app.get('/api/token_balance', function (req, res) {
   var contractAddress = req.query.contract
   var address = req.query.address
   var provider = req.query.provider
-  var web3 = new Web3(new Web3.providers.HttpProvider(provider))
+  var prov
+  if (provider === 'sokol') {
+    prov = 'https://sokol.poa.network'
+  } else if (provider === 'core') {
+    prov = 'https://core.poa.network'
+  }
+
+  var web3 = new Web3(new Web3.providers.HttpProvider(prov))
   if (!contractAddress) {
     res.send('No contract address sent')
   }
@@ -42,8 +49,6 @@ app.get('/api/token', function (req, res) {
   } else if (provider === 'core') {
     prov = 'https://core.poa.network'
   }
-
-  console.log(prov)
 
   var web3 = new Web3(new Web3.providers.HttpProvider(prov))
 
