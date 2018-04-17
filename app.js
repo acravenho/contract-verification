@@ -6,6 +6,67 @@ const PORT = process.env.PORT || 3333
 var app = express()
 app.use(express.json())
 
+app.get('/api/token_balance', function (req, res) {
+  var contractABI = require('./contracts/erc20.json')
+  var provider = 'https://sokol.poa.network'
+  var web3 = new Web3(new Web3.providers.HttpProvider(provider))
+
+  var contractAddress = req.query.contract
+  var address = req.query.address
+  if (!contractAddress) {
+    res.send('No contract address sent')
+  }
+  if (!address) {
+    res.send('No address sent')
+  }
+  var tokenContract = new web3.eth.Contract(contractABI, contractAddress)
+  tokenContract.methods.balanceOf(address).call(function (err, balance) {
+    if (err) {
+      res.send(err)
+    }
+    var data = {
+      'balance': balance,
+      'address': address,
+      'contractAddress': contractAddress
+    }
+    res.send(data)
+  })
+})
+
+app.get('/api/token', function (req, res) {
+  var contractABI = require('./contracts/erc20.json')
+  var provider = 'https://sokol.poa.network'
+  var web3 = new Web3(new Web3.providers.HttpProvider(provider))
+
+  var contractAddress = req.query.contract
+  if (!contractAddress) {
+    res.send('No contract address sent')
+  }
+  var tokenContract = new web3.eth.Contract(contractABI, contractAddress)
+  tokenContract.methods.totalSupply().call(function (err, totalSupply) {
+    if (err) {
+      res.send(err)
+    }
+    tokenContract.methods.decimals().call(function (err, decimals) {
+      if (err) {
+        res.send(err)
+      }
+      tokenContract.methods.name().call(function (err, name) {
+        if (err) {
+          res.send(err)
+        }
+        var data = {
+          'tokenName': name,
+          'decimals': decimals,
+          'totalSupply': totalSupply,
+          'contractAddress': contractAddress
+        }
+        res.send(data)
+      })
+    })
+  })
+})
+
 app.post('/api/verify', function (req, res) {
   var address = req.body.address
   var version = req.body.version
