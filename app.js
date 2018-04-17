@@ -8,11 +8,10 @@ app.use(express.json())
 
 app.get('/api/token_balance', function (req, res) {
   var contractABI = require('./contracts/erc20.json')
-  var provider = 'https://sokol.poa.network'
-  var web3 = new Web3(new Web3.providers.HttpProvider(provider))
-
   var contractAddress = req.query.contract
   var address = req.query.address
+  var provider = req.query.provider
+  var web3 = new Web3(new Web3.providers.HttpProvider(provider))
   if (!contractAddress) {
     res.send('No contract address sent')
   }
@@ -35,10 +34,10 @@ app.get('/api/token_balance', function (req, res) {
 
 app.get('/api/token', function (req, res) {
   var contractABI = require('./contracts/erc20.json')
-  var provider = 'https://sokol.poa.network'
+  var provider = req.query.provider
+  var contractAddress = req.query.contract
   var web3 = new Web3(new Web3.providers.HttpProvider(provider))
 
-  var contractAddress = req.query.contract
   if (!contractAddress) {
     res.send('No contract address sent')
   }
