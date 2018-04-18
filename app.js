@@ -1,6 +1,7 @@
 const Web3 = require('web3')
 const solc = require('solc')
 const express = require('express')
+const BigNumber = require('bignumber.js')
 const PORT = process.env.PORT || 3333
 
 var app = express()
@@ -30,12 +31,12 @@ app.get('/api/token_balance', function (req, res) {
     if (err) {
       res.send(err)
     }
-    tokenContract.methods.decimals(address).call(function (err, decimals) {
+    tokenContract.methods.decimals().call(function (err, decimals) {
       if (err) {
         res.send(err)
       }
-      var divisor = new web3.BigNumber(10).toPower(decimals)
-      balance = balance.div(divisor)
+      balance = new BigNumber(balance).toString() / Math.pow(10, decimals)
+
       var data = {
         'balance': balance,
         'address': address,
@@ -79,8 +80,7 @@ app.get('/api/token', function (req, res) {
           if (err) {
             res.send(err)
           }
-          var divisor = new web3.BigNumber(10).toPower(decimals)
-          totalSupply = totalSupply.div(divisor)
+          totalSupply = new BigNumber(totalSupply).toString() / Math.pow(10, decimals)
           var data = {
             'tokenName': name,
             'decimals': decimals,

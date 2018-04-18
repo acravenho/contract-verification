@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/acravenho/contract-verification#readme",
   "dependencies": {
+    "bignumber.js": "^6.0.0",
     "express": "^4.16.3",
     "fs": "0.0.1-security",
     "solc": "^0.4.21",
