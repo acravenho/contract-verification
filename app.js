@@ -30,12 +30,19 @@ app.get('/api/token_balance', function (req, res) {
     if (err) {
       res.send(err)
     }
-    var data = {
-      'balance': balance,
-      'address': address,
-      'contractAddress': contractAddress
-    }
-    res.send(data)
+    tokenContract.methods.decimals(address).call(function (err, decimals) {
+      if (err) {
+        res.send(err)
+      }
+      var divisor = new web3.BigNumber(10).toPower(decimals)
+      balance = balance.div(divisor)
+      var data = {
+        'balance': balance,
+        'address': address,
+        'contractAddress': contractAddress
+      }
+      res.send(data)
+    })
   })
 })
 
@@ -72,6 +79,8 @@ app.get('/api/token', function (req, res) {
           if (err) {
             res.send(err)
           }
+          var divisor = new web3.BigNumber(10).toPower(decimals)
+          totalSupply = totalSupply.div(divisor)
           var data = {
             'tokenName': name,
             'decimals': decimals,
