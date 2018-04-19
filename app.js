@@ -17,6 +17,8 @@ app.get('/api/token_balance', function (req, res) {
     prov = 'https://sokol.poa.network'
   } else if (provider === 'core') {
     prov = 'https://core.poa.network'
+  } else if (provider === 'kovan') {
+    prov = 'https://kovan.infura.io'
   }
 
   var web3 = new Web3(new Web3.providers.HttpProvider(prov))
@@ -35,8 +37,8 @@ app.get('/api/token_balance', function (req, res) {
       if (err) {
         res.send(err)
       }
-      balance = new BigNumber(balance).toString() / Math.pow(10, decimals)
-
+      decimals = 10 ** decimals
+      balance = new BigNumber(balance.toString()).div(decimals)
       var data = {
         'balance': balance,
         'address': address,
@@ -56,6 +58,8 @@ app.get('/api/token', function (req, res) {
     prov = 'https://sokol.poa.network'
   } else if (provider === 'core') {
     prov = 'https://core.poa.network'
+  } else if (provider === 'kovan') {
+    prov = 'https://kovan.infura.io'
   }
 
   var web3 = new Web3(new Web3.providers.HttpProvider(prov))
@@ -80,7 +84,8 @@ app.get('/api/token', function (req, res) {
           if (err) {
             res.send(err)
           }
-          totalSupply = new BigNumber(totalSupply).toString() / Math.pow(10, decimals)
+          var places = 10 ** decimals
+          totalSupply = new BigNumber(totalSupply.toString()).div(places)
           var data = {
             'tokenName': name,
             'decimals': decimals,
