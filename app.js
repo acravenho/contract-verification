@@ -8,10 +8,18 @@ var app = express()
 app.use(express.json())
 
 app.get('/api/token_balance', function (req, res) {
-  var contractABI = require('./contracts/erc20.json')
   var contractAddress = req.query.contract
   var address = req.query.address
   var provider = req.query.provider
+  var tokentype = req.query.tokentype
+  var contractABI
+
+  if (tokentype === 20) {
+    contractABI = require('./contracts/erc20.json')
+  } else {
+    contractABI = require('./contracts/erc721.json')
+  }
+
   var prov
   if (provider === 'sokol') {
     prov = 'https://sokol.poa.network'
@@ -50,9 +58,9 @@ app.get('/api/token_balance', function (req, res) {
 })
 
 app.get('/api/token', function (req, res) {
-  var contractABI = require('./contracts/erc20.json')
   var provider = req.query.provider
   var contractAddress = req.query.contract
+  var tokentype = req.query.tokentype
   var prov
   if (provider === 'sokol') {
     prov = 'https://sokol.poa.network'
@@ -62,42 +70,69 @@ app.get('/api/token', function (req, res) {
     prov = 'https://kovan.infura.io'
   }
 
+  var contractABI
+
+  if (tokentype === 721) {
+    contractABI = require('./contracts/erc721.json')
+  } else {
+    contractABI = require('./contracts/erc20.json')
+  }
+
   var web3 = new Web3(new Web3.providers.HttpProvider(prov))
 
   if (!contractAddress) {
     res.send('No contract address sent')
   }
   var tokenContract = new web3.eth.Contract(contractABI, contractAddress)
-  tokenContract.methods.totalSupply().call(function (err, totalSupply) {
-    if (err) {
-      res.send(err)
-    }
-    tokenContract.methods.decimals().call(function (err, decimals) {
+  if (tokentype === 721) {
+    tokenContract.methods.name().call(function (err, name) {
       if (err) {
         res.send(err)
       }
-      tokenContract.methods.name().call(function (err, name) {
+      tokenContract.methods.symbol().call(function (err, symbol) {
         if (err) {
           res.send(err)
         }
-        tokenContract.methods.symbol().call(function (err, symbol) {
+        var data = {
+          'tokenName': name,
+          'symbol': symbol,
+          'contractAddress': contractAddress
+        }
+        res.send(data)
+      })
+    })
+  } else {
+    tokenContract.methods.totalSupply().call(function (err, totalSupply) {
+      if (err) {
+        res.send(err)
+      }
+      tokenContract.methods.decimals().call(function (err, decimals) {
+        if (err) {
+          res.send(err)
+        }
+        tokenContract.methods.name().call(function (err, name) {
           if (err) {
             res.send(err)
           }
-          var places = 10 ** decimals
-          totalSupply = new BigNumber(totalSupply.toString()).div(places)
-          var data = {
-            'tokenName': name,
-            'decimals': decimals,
-            'totalSupply': totalSupply,
-            'symbol': symbol,
-            'contractAddress': contractAddress
-          }
-          res.send(data)
+          tokenContract.methods.symbol().call(function (err, symbol) {
+            if (err) {
+              res.send(err)
+            }
+            var places = 10 ** decimals
+            totalSupply = new BigNumber(totalSupply.toString()).div(places)
+            var data = {
+              'tokenName': name,
+              'decimals': decimals,
+              'totalSupply': totalSupply,
+              'symbol': symbol,
+              'contractAddress': contractAddress
+            }
+            res.send(data)
+          })
         })
       })
     })
-  })
+  }
 })
 
 app.post('/api/verify', function (req, res) {
