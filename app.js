@@ -70,21 +70,15 @@ app.get('/api/token', function (req, res) {
     prov = 'https://kovan.infura.io'
   }
 
-  var contractABI
-
-  if (tokentype === 721) {
-    contractABI = require('./contracts/erc721.json')
-  } else {
-    contractABI = require('./contracts/erc20.json')
-  }
-
+  var contractABI = require('./contracts/erc' + tokentype + '.json')
   var web3 = new Web3(new Web3.providers.HttpProvider(prov))
 
   if (!contractAddress) {
     res.send('No contract address sent')
   }
   var tokenContract = new web3.eth.Contract(contractABI, contractAddress)
-  if (tokentype === 721) {
+  if (tokentype === '721') {
+    console.log('721: ' + tokentype)
     tokenContract.methods.name().call(function (err, name) {
       if (err) {
         res.send(err)
@@ -102,6 +96,7 @@ app.get('/api/token', function (req, res) {
       })
     })
   } else {
+    console.log('20 ' + tokentype)
     tokenContract.methods.totalSupply().call(function (err, totalSupply) {
       if (err) {
         res.send(err)
